@@ -1,0 +1,120 @@
+# Expense Tracker Project
+# Author: Your Name
+# Description: A simple Python project to track daily expenses and calculate total spending.
+
+import datetime
+
+# Function to display menu options
+def display_menu():
+    print("\n========== EXPENSE TRACKER ==========")
+    print("1. Add Expense")
+    print("2. View All Expenses")
+    print("3. View Total Expenses")
+    print("4. Search Expense by Category")
+    print("5. Delete All Expenses")
+    print("6. Exit")
+    print("=====================================")
+
+# Function to add a new expense
+def add_expense(expenses):
+    category = input("Enter expense category (e.g., Food, Travel, Shopping): ")
+    amount = float(input("Enter amount spent: ₹"))
+    description = input("Enter short description: ")
+    date = datetime.date.today()
+
+    expense = {
+        "category": category,
+        "amount": amount,
+        "description": description,
+        "date": str(date)
+    }
+    expenses.append(expense)
+    save_expenses(expenses)
+    print("✅ Expense added successfully!")
+
+# Function to save expenses to file
+def save_expenses(expenses):
+    with open("expenses.txt", "w") as file:
+        for exp in expenses:
+            file.write(f"{exp['category']},{exp['amount']},{exp['description']},{exp['date']}\n")
+
+# Function to load expenses from file
+def load_expenses():
+    expenses = []
+    try:
+        with open("expenses.txt", "r") as file:
+            for line in file:
+                category, amount, description, date = line.strip().split(",")
+                expenses.append({
+                    "category": category,
+                    "amount": float(amount),
+                    "description": description,
+                    "date": date
+                })
+    except FileNotFoundError:
+        pass
+    return expenses
+
+# Function to view all expenses
+def view_expenses(expenses):
+    if not expenses:
+        print("No expenses recorded yet!")
+        return
+    print("\n------ Your Expenses ------")
+    for i, exp in enumerate(expenses, start=1):
+        print(f"{i}. {exp['date']} | {exp['category']} | ₹{exp['amount']} | {exp['description']}")
+    print("----------------------------")
+
+# Function to calculate total expenses
+def total_expenses(expenses):
+    total = sum(exp['amount'] for exp in expenses)
+    print(f"\n💵 Total Expenses: ₹{total:.2f}")
+
+# Function to search expenses by category
+def search_expense(expenses):
+    cat = input("Enter category to search: ")
+    found = [exp for exp in expenses if exp['category'].lower() == cat.lower()]
+    if found:
+        print(f"\nExpenses in category '{cat}':")
+        for exp in found:
+            print(f"  ₹{exp['amount']} on {exp['date']} ({exp['description']})")
+    else:
+        print("No expenses found for this category!")
+
+# Function to delete all expenses
+def delete_all(expenses):
+    confirm = input("Are you sure you want to delete all expenses? (y/n): ")
+    if confirm.lower() == "y":
+        expenses.clear()
+        save_expenses(expenses)
+        print("🗑 All expenses deleted successfully!")
+    else:
+        print("Deletion cancelled.")
+
+# Main program
+def main():
+    expenses = load_expenses()
+
+    while True:
+        display_menu()
+        choice = input("Enter your choice (1-6): ")
+
+        if choice == "1":
+            add_expense(expenses)
+        elif choice == "2":
+            view_expenses(expenses)
+        elif choice == "3":
+            total_expenses(expenses)
+        elif choice == "4":
+            search_expense(expenses)
+        elif choice == "5":
+            delete_all(expenses)
+        elif choice == "6":
+            print("👋 Exiting... Thank you for using Expense Tracker!")
+            break
+        else:
+            print("Invalid choice! Please try again.")
+
+# Run the program
+if _name_ == "_main_":
+    main()
